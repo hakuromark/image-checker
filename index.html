@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>画像解像度チェッカー</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', 'Yu Gothic UI', 'Meiryo', sans-serif;
+    background: #f5f6fa;
+    color: #2d3436;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ---- Header ---- */
+  .header {
+    background: linear-gradient(135deg, #0f172a, #1e293b);
+    color: #fff;
+    padding: 28px 32px;
+  }
+  .header h1 {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+  .header p {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-top: 4px;
+  }
+
+  /* ---- Container / Panel ---- */
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 28px;
+  }
+  .panel {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.06), 0 4px 16px rgba(0,0,0,0.04);
+    padding: 28px;
+    margin-bottom: 24px;
+  }
+  .panel-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .step-num {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: #0f172a;
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  /* ---- SVG Icons ---- */
+  .icon-svg {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.125em;
+    fill: currentColor;
+  }
+
+  /* ---- Drop Zone ---- */
+  .drop-zone {
+    border: 2px dashed #cbd5e1;
+    border-radius: 14px;
+    padding: 52px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    background: #f8fafc;
+    position: relative;
+  }
+  .drop-zone:hover, .drop-zone.drag-over {
+    border-color: #3b82f6;
+    background: #eff6ff;
+  }
+  .drop-zone.has-image {
+    padding: 16px;
+    border-style: solid;
+    border-color: #10b981;
+    background: #f0fdf4;
+  }
+  .drop-zone input[type="file"] {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .drop-zone .placeholder { color: #94a3b8; }
+  .drop-zone .placeholder .upload-icon {
+    width: 48px;
+    height: 48px;
+    margin: 0 auto 16px;
+    color: #cbd5e1;
+  }
+  .drop-zone .placeholder p { font-size: 15px; color: #64748b; }
+  .drop-zone .placeholder .sub { font-size: 12px; color: #94a3b8; margin-top: 8px; }
+  .preview-thumb {
+    max-width: 100%;
+    max-height: 300px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+  .image-info { font-size: 13px; color: #64748b; }
+
+  /* ---- Size Inputs ---- */
+  .size-inputs {
+    display: flex;
+    gap: 16px;
+    align-items: flex-end;
+    flex-wrap: wrap;
+  }
+  .input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .input-group label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .input-group input {
+    width: 140px;
+    padding: 10px 14px;
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    font-size: 16px;
+    transition: all 0.2s;
+    outline: none;
+    background: #f8fafc;
+  }
+  .input-group input:focus {
+    border-color: #3b82f6;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
+  }
+  .input-group .unit { font-size: 14px; color: #94a3b8; align-self: center; }
+  .size-row { display: flex; align-items: flex-end; gap: 8px; }
+  .size-separator {
+    font-size: 20px;
+    color: #94a3b8;
+    padding-bottom: 10px;
+    font-weight: 600;
+  }
+  .btn-check {
+    padding: 10px 32px;
+    background: #0f172a;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .btn-check:hover {
+    background: #1e293b;
+    box-shadow: 0 4px 14px rgba(15,23,42,0.25);
+    transform: translateY(-1px);
+  }
+  .btn-check:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* ---- Preset buttons ---- */
+  .preset-section { margin-top: 16px; }
+  .preset-section label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    display: block;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .preset-buttons { display: flex; flex-wrap: wrap; gap: 6px; }
+  .preset-btn {
+    padding: 6px 14px;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: #64748b;
+    font-weight: 500;
+  }
+  .preset-btn:hover {
+    border-color: #3b82f6;
+    color: #3b82f6;
+    background: #eff6ff;
+  }
+
+  /* ---- Result Banner ---- */
+  .result-area { display: none; }
+  .result-banner {
+    padding: 24px 28px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  .result-banner.ok {
+    background: #f0fdf4;
+    border: 1.5px solid #bbf7d0;
+  }
+  .result-banner.ng {
+    background: #fef7ee;
+    border: 1.5px solid #fed7aa;
+  }
+  .result-icon-wrap {
+    width: 52px;
+    height: 52px;
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .result-banner.ok .result-icon-wrap {
+    background: #dcfce7;
+    color: #16a34a;
+  }
+  .result-banner.ng .result-icon-wrap {
+    background: #ffedd5;
+    color: #ea580c;
+  }
+  .result-icon-wrap svg { width: 26px; height: 26px; }
+  .result-text h2 { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+  .result-banner.ok .result-text h2 { color: #15803d; }
+  .result-banner.ng .result-text h2 { color: #c2410c; }
+  .result-text p { font-size: 14px; color: #64748b; line-height: 1.5; }
+
+  /* Ratio warning */
+  .result-banner.ratio {
+    background: #eff6ff;
+    border: 1.5px solid #bfdbfe;
+  }
+  .result-banner.ratio .result-icon-wrap {
+    background: #dbeafe;
+    color: #2563eb;
+  }
+  .result-banner.ratio .result-text h2 { color: #1d4ed8; }
+  .ratio-detail {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 6px;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .ratio-detail span { font-weight: 600; color: #334155; }
+
+  /* ---- DPI Cards ---- */
+  .dpi-details {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+  .dpi-card {
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 16px 18px;
+    text-align: center;
+    border: 1.5px solid #f1f5f9;
+  }
+  .dpi-card .label {
+    font-size: 11px;
+    font-weight: 600;
+    color: #94a3b8;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .dpi-card .value {
+    font-size: 22px;
+    font-weight: 800;
+    color: #0f172a;
+  }
+  .dpi-card .value.ok { color: #16a34a; }
+  .dpi-card .value.ng { color: #ea580c; }
+  .dpi-card .unit { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+
+  /* ---- Zoom Preview ---- */
+  .zoom-section { display: none; }
+  .zoom-section h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #c2410c;
+    margin-bottom: 12px;
+  }
+  .zoom-note {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 16px;
+    background: #fffbeb;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border-left: 4px solid #f59e0b;
+    line-height: 1.6;
+  }
+  .zoom-container {
+    position: relative;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fafafa;
+  }
+  .zoom-canvas-wrapper {
+    overflow: auto;
+    max-height: 500px;
+    cursor: grab;
+  }
+  .zoom-canvas-wrapper:active { cursor: grabbing; }
+  .zoom-canvas-wrapper canvas { display: block; }
+
+  .zoom-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 900px) {
+    .zoom-grid { grid-template-columns: 1fr; }
+  }
+  .zoom-grid-item { min-width: 0; }
+  .zoom-grid-label {
+    font-size: 12px;
+    font-weight: 700;
+    color: #64748b;
+    margin-bottom: 0;
+    text-align: center;
+    background: #f1f5f9;
+    padding: 6px 0;
+    border-radius: 10px 10px 0 0;
+    letter-spacing: 0.04em;
+  }
+
+  /* ---- Full Preview ---- */
+  .full-preview-section { margin-top: 20px; }
+  .full-preview-section h3 {
+    font-size: 15px;
+    font-weight: 700;
+    color: #334155;
+    margin-bottom: 12px;
+  }
+  .full-preview-container {
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fafafa;
+  }
+  .full-preview-container canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+
+  /* ---- Reset button ---- */
+  .reset-btn {
+    padding: 8px 20px;
+    background: #fff;
+    color: #94a3b8;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .reset-btn:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+    background: #fef2f2;
+  }
+
+  /* ---- Download buttons ---- */
+  .btn-download {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: #fff;
+    color: #334155;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 0 0 10px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+    margin-top: -1px;
+  }
+  .btn-download:hover {
+    background: #0f172a;
+    color: #fff;
+    border-color: #0f172a;
+  }
+  .btn-download svg { width: 14px; height: 14px; }
+  .btn-download-all {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 24px;
+    background: #0f172a;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-download-all:hover {
+    background: #1e293b;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(15,23,42,0.25);
+  }
+  .btn-download-all svg { width: 16px; height: 16px; }
+  .zoom-download-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+</style>
+</head>
+<body>
+
+<!-- SVG sprite (hidden) -->
+<svg style="display:none" xmlns="http://www.w3.org/2000/svg">
+  <symbol id="ico-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+    <polyline points="17 8 12 3 7 8"/>
+    <line x1="12" y1="3" x2="12" y2="15"/>
+  </symbol>
+  <symbol id="ico-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M20 6 9 17l-5-5"/>
+  </symbol>
+  <symbol id="ico-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="10"/>
+    <line x1="12" y1="8" x2="12" y2="12"/>
+    <line x1="12" y1="16" x2="12.01" y2="16"/>
+  </symbol>
+  <symbol id="ico-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+    <polyline points="7 10 12 15 17 10"/>
+    <line x1="12" y1="15" x2="12" y2="3"/>
+  </symbol>
+  <symbol id="ico-ratio" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="2" y="4" width="20" height="16" rx="2"/>
+    <line x1="2" y1="4" x2="22" y2="20"/>
+  </symbol>
+</svg>
+
+<div class="header">
+  <h1>画像解像度チェッカー</h1>
+  <p>入稿画像の解像度を注文サイズに対してチェックします</p>
+</div>
+
+<div class="container">
+  <!-- Step 1 -->
+  <div class="panel">
+    <div class="panel-title">
+      <span class="step-num">1</span> 画像をアップロード
+    </div>
+    <div class="drop-zone" id="dropZone">
+      <input type="file" id="fileInput" accept="image/*">
+      <div class="placeholder" id="placeholder">
+        <div class="upload-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+        </div>
+        <p>ここに画像をドラッグ＆ドロップ</p>
+        <p>またはクリックしてファイルを選択</p>
+        <p class="sub">対応形式: JPG, PNG, BMP, TIFF, GIF</p>
+      </div>
+      <div id="previewArea" style="display:none;">
+        <img id="previewImg" class="preview-thumb" alt="プレビュー">
+        <div class="image-info" id="imageInfo"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Step 2 -->
+  <div class="panel">
+    <div class="panel-title">
+      <span class="step-num">2</span> 注文サイズを入力
+    </div>
+    <div class="size-inputs">
+      <div class="size-row">
+        <div class="input-group">
+          <label for="widthInput">横幅</label>
+          <input type="number" id="widthInput" placeholder="例: 1200" min="1">
+        </div>
+        <span class="size-separator">&times;</span>
+        <div class="input-group">
+          <label for="heightInput">縦幅</label>
+          <input type="number" id="heightInput" placeholder="例: 900" min="1">
+        </div>
+        <div class="input-group">
+          <label>&nbsp;</label>
+          <span class="unit">mm</span>
+        </div>
+      </div>
+      <div class="input-group">
+        <label>&nbsp;</label>
+        <button class="btn-check" id="checkBtn" disabled>チェックする</button>
+      </div>
+    </div>
+    <div class="preset-section">
+      <label>よく使うサイズ</label>
+      <div class="preset-buttons">
+        <button class="preset-btn" data-w="450" data-h="1500">のぼり (450&times;1500)</button>
+        <button class="preset-btn" data-w="450" data-h="1800">のぼり (450&times;1800)</button>
+        <button class="preset-btn" data-w="600" data-h="1800">のぼり (600&times;1800)</button>
+        <button class="preset-btn" data-w="1000" data-h="700">旗 (1000&times;700)</button>
+        <button class="preset-btn" data-w="1350" data-h="900">旗 (1500&times;1000)</button>
+        <button class="preset-btn" data-w="1500" data-h="1000">旗 (1500&times;1000)</button>
+        <button class="preset-btn" data-w="1800" data-h="1200">旗 (1500&times;1000)</button>
+        <button class="preset-btn" data-w="2100" data-h="1400">旗 (1500&times;1000)</button>
+        <button class="preset-btn" data-w="2700" data-h="1800">旗 (1500&times;1000)</button>
+        <button class="preset-btn" data-w="3000" data-h="2000">旗 (2000&times;1500)</button>
+        <button class="preset-btn" data-w="3000" data-h="900">横断幕 (3000&times;900)</button>
+        <button class="preset-btn" data-w="5000" data-h="1200">横断幕 大 (5000&times;1200)</button>
+        <button class="preset-btn" data-w="1000" data-h="1500">タペストリー (1000&times;1500)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Result -->
+  <div class="result-area" id="resultArea">
+    <div class="panel">
+      <div class="panel-title">
+        <span class="step-num">3</span> チェック結果
+        <button class="reset-btn" id="resetBtn" style="margin-left:auto;">リセット</button>
+      </div>
+
+      <div class="result-banner" id="resultBanner">
+        <div class="result-icon-wrap" id="resultIconWrap"></div>
+        <div class="result-text">
+          <h2 id="resultTitle"></h2>
+          <p id="resultDesc"></p>
+        </div>
+      </div>
+
+      <div class="result-banner ratio" id="ratioBanner" style="display:none;">
+        <div class="result-icon-wrap">
+          <svg><use href="#ico-ratio"/></svg>
+        </div>
+        <div class="result-text">
+          <h2>縦横比が異なります</h2>
+          <p id="ratioDesc"></p>
+          <div class="ratio-detail">
+            <div>画像の縦横比: <span id="ratioImg">-</span></div>
+            <div>注文の縦横比: <span id="ratioOrder">-</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="dpi-details">
+        <div class="dpi-card">
+          <div class="label">画像サイズ</div>
+          <div class="value" id="imgSizeValue">-</div>
+          <div class="unit">px</div>
+        </div>
+        <div class="dpi-card">
+          <div class="label">画像サイズ（100dpi換算）</div>
+          <div class="value" id="imgSizeMmValue">-</div>
+          <div class="unit">mm -- 綺麗に印刷できる最大サイズ</div>
+        </div>
+        <div class="dpi-card">
+          <div class="label">注文サイズ</div>
+          <div class="value" id="orderSizeValue">-</div>
+          <div class="unit">mm</div>
+        </div>
+        <div class="dpi-card">
+          <div class="label">横方向 解像度</div>
+          <div class="value" id="dpiHValue">-</div>
+          <div class="unit">dpi</div>
+        </div>
+        <div class="dpi-card">
+          <div class="label">縦方向 解像度</div>
+          <div class="value" id="dpiVValue">-</div>
+          <div class="unit">dpi</div>
+        </div>
+        <div class="dpi-card">
+          <div class="label">有効解像度（低い方）</div>
+          <div class="value" id="dpiMinValue">-</div>
+          <div class="unit">dpi</div>
+        </div>
+      </div>
+
+      <!-- Zoom preview -->
+      <div class="zoom-section" id="zoomSection">
+        <h3>実寸拡大プレビュー -- 印刷時のイメージ</h3>
+        <div class="zoom-note">
+          画像データを実際の印刷サイズに拡大した場合のプレビューです。<br>
+          近くで見るとぼやけて見える場合があります。各画像はドラッグでスクロールできます。
+        </div>
+        <div class="zoom-download-bar">
+          <button class="btn-download-all" id="downloadAllBtn">
+            <svg><use href="#ico-download"/></svg>
+            拡大画像をすべてダウンロード
+          </button>
+        </div>
+        <div class="zoom-grid">
+          <div class="zoom-grid-item">
+            <div class="zoom-grid-label">左上</div>
+            <div class="zoom-container"><div class="zoom-canvas-wrapper" data-zoom="top-left"><canvas></canvas></div></div>
+            <button class="btn-download" data-dl="top-left"><svg><use href="#ico-download"/></svg>ダウンロード</button>
+          </div>
+          <div class="zoom-grid-item">
+            <div class="zoom-grid-label">中央上</div>
+            <div class="zoom-container"><div class="zoom-canvas-wrapper" data-zoom="top-center"><canvas></canvas></div></div>
+            <button class="btn-download" data-dl="top-center"><svg><use href="#ico-download"/></svg>ダウンロード</button>
+          </div>
+          <div class="zoom-grid-item">
+            <div class="zoom-grid-label">右上</div>
+            <div class="zoom-container"><div class="zoom-canvas-wrapper" data-zoom="top-right"><canvas></canvas></div></div>
+            <button class="btn-download" data-dl="top-right"><svg><use href="#ico-download"/></svg>ダウンロード</button>
+          </div>
+          <div class="zoom-grid-item">
+            <div class="zoom-grid-label">中央左</div>
+            <div class="zoom-container"><div class="zoom-canvas-wrapper" data-zoom="middle-left"><canvas></canvas></div></div>
+            <button class="btn-download" data-dl="middle-left"><svg><use href="#ico-download"/></svg>ダウンロード</button>
+          </div>
+          <div class="zoom-grid-item">
+            <div class="zoom-grid-label">中央</div>
+            <div class="zoom-container"><div class="zoom-canvas-wrapper" data-zoom="center"><canvas></canvas></div></div>
+            <button class="btn-download" data-dl="center"><svg><use href="#ico-download"/></svg>ダウンロード</button>
+          </div>
+          <div class="zoom-grid-item">
+            <div class="zoom-grid-label">中央右</div>
+            <div class="zoom-container"><div class="zoom-canvas-wrapper" data-zoom="middle-right"><canvas></canvas></div></div>
+            <button class="btn-download" data-dl="middle-right"><svg><use href="#ico-download"/></svg>ダウンロード</button>
+          </div>
+          <div class="zoom-grid-item">
+            <div class="zoom-grid-label">左下</div>
+            <div class="zoom-container"><div class="zoom-canvas-wrapper" data-zoom="bottom-left"><canvas></canvas></div></div>
+            <button class="btn-download" data-dl="bottom-left"><svg><use href="#ico-download"/></svg>ダウンロード</button>
+          </div>
+          <div class="zoom-grid-item">
+            <div class="zoom-grid-label">中央下</div>
+            <div class="zoom-container"><div class="zoom-canvas-wrapper" data-zoom="bottom-center"><canvas></canvas></div></div>
+            <button class="btn-download" data-dl="bottom-center"><svg><use href="#ico-download"/></svg>ダウンロード</button>
+          </div>
+          <div class="zoom-grid-item">
+            <div class="zoom-grid-label">右下</div>
+            <div class="zoom-container"><div class="zoom-canvas-wrapper" data-zoom="bottom-right"><canvas></canvas></div></div>
+            <button class="btn-download" data-dl="bottom-right"><svg><use href="#ico-download"/></svg>ダウンロード</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Full preview -->
+      <div class="full-preview-section">
+        <h3>全体プレビュー（注文サイズに合わせた表示）</h3>
+        <div class="full-preview-container">
+          <canvas id="fullCanvas"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const dropZone = document.getElementById('dropZone');
+  const fileInput = document.getElementById('fileInput');
+  const placeholder = document.getElementById('placeholder');
+  const previewArea = document.getElementById('previewArea');
+  const previewImg = document.getElementById('previewImg');
+  const imageInfo = document.getElementById('imageInfo');
+  const widthInput = document.getElementById('widthInput');
+  const heightInput = document.getElementById('heightInput');
+  const checkBtn = document.getElementById('checkBtn');
+  const resultArea = document.getElementById('resultArea');
+  const resultBanner = document.getElementById('resultBanner');
+  const resultIconWrap = document.getElementById('resultIconWrap');
+  const resultTitle = document.getElementById('resultTitle');
+  const resultDesc = document.getElementById('resultDesc');
+  const resetBtn = document.getElementById('resetBtn');
+  const zoomSection = document.getElementById('zoomSection');
+  const fullCanvas = document.getElementById('fullCanvas');
+
+  const DPI_THRESHOLD = 100;
+  let loadedImage = null;
+  let loadedFileName = '';
+
+  // ---- Drag & Drop ----
+  dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+  dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('drag-over'); });
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) handleFile(file);
+  });
+  fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
+
+  function handleFile(file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        loadedImage = img;
+        loadedFileName = file.name.replace(/\.[^.]+$/, '');
+        previewImg.src = e.target.result;
+        const fileSizeKB = (file.size / 1024).toFixed(1);
+        const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
+        const sizeStr = file.size > 1024 * 1024 ? `${fileSizeMB} MB` : `${fileSizeKB} KB`;
+        imageInfo.textContent = `${file.name}  |  ${img.naturalWidth} \u00d7 ${img.naturalHeight} px  |  ${sizeStr}`;
+        placeholder.style.display = 'none';
+        previewArea.style.display = 'block';
+        dropZone.classList.add('has-image');
+        updateCheckBtn();
+        resultArea.style.display = 'none';
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  // ---- Presets ----
+  document.querySelectorAll('.preset-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      widthInput.value = btn.dataset.w;
+      heightInput.value = btn.dataset.h;
+      updateCheckBtn();
+    });
+  });
+
+  widthInput.addEventListener('input', updateCheckBtn);
+  heightInput.addEventListener('input', updateCheckBtn);
+  function updateCheckBtn() {
+    checkBtn.disabled = !(loadedImage && widthInput.value > 0 && heightInput.value > 0);
+  }
+
+  // ---- Check ----
+  checkBtn.addEventListener('click', runCheck);
+
+  function runCheck() {
+    if (!loadedImage) return;
+    const orderW_mm = parseFloat(widthInput.value);
+    const orderH_mm = parseFloat(heightInput.value);
+    if (!orderW_mm || !orderH_mm) return;
+
+    const imgW = loadedImage.naturalWidth;
+    const imgH = loadedImage.naturalHeight;
+    const dpiH = imgW / (orderW_mm / 25.4);
+    const dpiV = imgH / (orderH_mm / 25.4);
+    const dpiMin = Math.min(dpiH, dpiV);
+    const isOk = dpiMin >= DPI_THRESHOLD;
+
+    resultArea.style.display = 'block';
+    resultBanner.className = 'result-banner ' + (isOk ? 'ok' : 'ng');
+    resultIconWrap.innerHTML = isOk
+      ? '<svg><use href="#ico-check"/></svg>'
+      : '<svg><use href="#ico-alert"/></svg>';
+    resultTitle.textContent = isOk ? 'OK -- 綺麗に印刷できます' : '画像が粗い可能性があります';
+    resultDesc.textContent = isOk
+      ? `実寸解像度 ${dpiMin.toFixed(1)} dpi は基準値 (${DPI_THRESHOLD} dpi) を超えています。問題なく印刷できます。`
+      : `実寸解像度 ${dpiMin.toFixed(1)} dpi は基準値 (${DPI_THRESHOLD} dpi) を下回っています。印刷すると画像がぼやける可能性があります。`;
+
+    document.getElementById('imgSizeValue').textContent = `${imgW} \u00d7 ${imgH}`;
+    const imgW_mm = Math.round(imgW / DPI_THRESHOLD * 25.4);
+    const imgH_mm = Math.round(imgH / DPI_THRESHOLD * 25.4);
+    document.getElementById('imgSizeMmValue').textContent = `${imgW_mm} \u00d7 ${imgH_mm}`;
+    document.getElementById('orderSizeValue').textContent = `${orderW_mm} \u00d7 ${orderH_mm}`;
+
+    const dpiHEl = document.getElementById('dpiHValue');
+    dpiHEl.textContent = dpiH.toFixed(1);
+    dpiHEl.className = 'value ' + (dpiH >= DPI_THRESHOLD ? 'ok' : 'ng');
+    const dpiVEl = document.getElementById('dpiVValue');
+    dpiVEl.textContent = dpiV.toFixed(1);
+    dpiVEl.className = 'value ' + (dpiV >= DPI_THRESHOLD ? 'ok' : 'ng');
+    const dpiMinEl = document.getElementById('dpiMinValue');
+    dpiMinEl.textContent = dpiMin.toFixed(1);
+    dpiMinEl.className = 'value ' + (isOk ? 'ok' : 'ng');
+
+    // ---- Aspect ratio check ----
+    const imgRatio = imgW / imgH;
+    const orderRatio = orderW_mm / orderH_mm;
+    const ratioDiff = Math.abs(imgRatio - orderRatio) / Math.max(imgRatio, orderRatio) * 100;
+    const ratioBanner = document.getElementById('ratioBanner');
+
+    if (ratioDiff > 3) {
+      ratioBanner.style.display = 'flex';
+      // Format ratio as simplified form e.g. "4:3"
+      function simplify(w, h) {
+        const g = gcd(Math.round(w * 100), Math.round(h * 100));
+        const sw = Math.round(w * 100 / g), sh = Math.round(h * 100 / g);
+        // If numbers are too large, show decimal form
+        if (sw > 50 || sh > 50) return (w / h).toFixed(2) + ' : 1';
+        return sw + ' : ' + sh;
+      }
+      function gcd(a, b) { return b === 0 ? a : gcd(b, a % b); }
+      document.getElementById('ratioImg').textContent = simplify(imgW, imgH);
+      document.getElementById('ratioOrder').textContent = simplify(orderW_mm, orderH_mm);
+      document.getElementById('ratioDesc').textContent =
+        `画像データと注文サイズの縦横比が約 ${ratioDiff.toFixed(1)}% 異なります。印刷時に余白が出るか、一部が切れる可能性があります。`;
+    } else {
+      ratioBanner.style.display = 'none';
+    }
+
+    if (!isOk) {
+      zoomSection.style.display = 'block';
+      drawAllZooms();
+    } else {
+      zoomSection.style.display = 'none';
+    }
+    drawFullPreview(orderW_mm, orderH_mm);
+    resultArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // ---- Zoom (9 panels) ----
+  const posMap = {
+    'top-left': [0, 0], 'top-center': [0.5, 0], 'top-right': [1, 0],
+    'middle-left': [0, 0.5], 'center': [0.5, 0.5], 'middle-right': [1, 0.5],
+    'bottom-left': [0, 1], 'bottom-center': [0.5, 1], 'bottom-right': [1, 1],
+  };
+
+  function drawAllZooms() {
+    if (!loadedImage) return;
+    document.querySelectorAll('.zoom-canvas-wrapper[data-zoom]').forEach(wrapper => {
+      drawZoomPanel(wrapper.querySelector('canvas'), wrapper.getAttribute('data-zoom'));
+    });
+  }
+
+  function drawZoomPanel(canvas, pos) {
+    if (!loadedImage) return;
+    const imgW = loadedImage.naturalWidth, imgH = loadedImage.naturalHeight;
+    const orderW_mm = parseFloat(widthInput.value), orderH_mm = parseFloat(heightInput.value);
+    if (!orderW_mm || !orderH_mm) return;
+
+    const scaleX = ((orderW_mm / 25.4) * 96) / imgW;
+    const scaleY = ((orderH_mm / 25.4) * 96) / imgH;
+    const scale = Math.max(scaleX, scaleY);
+    const srcCropW = Math.floor(400 / scale), srcCropH = Math.floor(400 / scale);
+    const [rx, ry] = posMap[pos] || [0.5, 0.5];
+    let sx = Math.floor((imgW - srcCropW) * rx), sy = Math.floor((imgH - srcCropH) * ry);
+    sx = Math.max(0, Math.min(sx, imgW - srcCropW));
+    sy = Math.max(0, Math.min(sy, imgH - srcCropH));
+    const aw = Math.max(1, Math.min(srcCropW, imgW)), ah = Math.max(1, Math.min(srcCropH, imgH));
+    canvas.width = Math.round(aw * scale);
+    canvas.height = Math.round(ah * scale);
+    const ctx = canvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'low';
+    ctx.drawImage(loadedImage, sx, sy, aw, ah, 0, 0, canvas.width, canvas.height);
+  }
+
+  // ---- Full Preview ----
+  function drawFullPreview(orderW_mm, orderH_mm) {
+    const w = fullCanvas.parentElement.clientWidth;
+    const h = w / (orderW_mm / orderH_mm);
+    fullCanvas.width = w; fullCanvas.height = h;
+    const ctx = fullCanvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'medium';
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0, 0, w, h);
+    ctx.drawImage(loadedImage, 0, 0, w, h);
+  }
+
+  // ---- Drag-scroll ----
+  let isDragging = false, dragTarget = null, dx, dy, sx, sy;
+  document.querySelectorAll('.zoom-canvas-wrapper').forEach(w => {
+    w.addEventListener('mousedown', (e) => {
+      isDragging = true; dragTarget = w;
+      dx = e.clientX; dy = e.clientY; sx = w.scrollLeft; sy = w.scrollTop;
+    });
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!isDragging || !dragTarget) return;
+    dragTarget.scrollLeft = sx - (e.clientX - dx);
+    dragTarget.scrollTop = sy - (e.clientY - dy);
+  });
+  window.addEventListener('mouseup', () => { isDragging = false; dragTarget = null; });
+
+  // ---- Download ----
+  const posLabels = {
+    'top-left': '左上', 'top-center': '中央上', 'top-right': '右上',
+    'middle-left': '中央左', 'center': '中央', 'middle-right': '中央右',
+    'bottom-left': '左下', 'bottom-center': '中央下', 'bottom-right': '右下',
+  };
+
+  function downloadCanvas(canvas, filename) {
+    canvas.toBlob(blob => {
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(a.href);
+    }, 'image/png');
+  }
+
+  document.querySelectorAll('.btn-download[data-dl]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const pos = btn.getAttribute('data-dl');
+      const canvas = document.querySelector(`.zoom-canvas-wrapper[data-zoom="${pos}"] canvas`);
+      if (canvas) downloadCanvas(canvas, `${loadedFileName || 'image'}_実寸拡大_${posLabels[pos] || pos}.png`);
+    });
+  });
+
+  document.getElementById('downloadAllBtn').addEventListener('click', () => {
+    document.querySelectorAll('.zoom-canvas-wrapper[data-zoom]').forEach(w => {
+      const pos = w.getAttribute('data-zoom');
+      downloadCanvas(w.querySelector('canvas'), `${loadedFileName || 'image'}_実寸拡大_${posLabels[pos] || pos}.png`);
+    });
+  });
+
+  // ---- Reset ----
+  resetBtn.addEventListener('click', () => {
+    resultArea.style.display = 'none';
+    loadedImage = null; loadedFileName = '';
+    previewImg.src = ''; imageInfo.textContent = '';
+    previewArea.style.display = 'none';
+    placeholder.style.display = '';
+    dropZone.classList.remove('has-image');
+    fileInput.value = '';
+    widthInput.value = ''; heightInput.value = '';
+    updateCheckBtn();
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+})();
+</script>
+</body>
+</html>
