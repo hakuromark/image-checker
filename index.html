@@ -276,7 +276,55 @@
   }
   .ratio-detail span { font-weight: 600; color: #334155; }
 
-  /* ---- DPI Cards ---- */
+  /* ---- DPI Hero ---- */
+  .dpi-hero {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 24px;
+    padding: 28px 20px;
+    border-radius: 14px;
+    text-align: center;
+  }
+  .dpi-hero.ok {
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+    border: 1.5px solid #bbf7d0;
+  }
+  .dpi-hero.ng {
+    background: linear-gradient(135deg, #fef7ee, #ffedd5);
+    border: 1.5px solid #fed7aa;
+  }
+  .dpi-hero-number {
+    font-size: 56px;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+  .dpi-hero.ok .dpi-hero-number { color: #16a34a; }
+  .dpi-hero.ng .dpi-hero-number { color: #ea580c; }
+  .dpi-hero-unit {
+    font-size: 20px;
+    font-weight: 700;
+    margin-top: 6px;
+  }
+  .dpi-hero.ok .dpi-hero-unit { color: #22c55e; }
+  .dpi-hero.ng .dpi-hero-unit { color: #f97316; }
+  .dpi-hero-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 4px;
+  }
+  .dpi-hero-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  /* ---- Detail Cards ---- */
   .dpi-details {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -361,25 +409,211 @@
     letter-spacing: 0.04em;
   }
 
-  /* ---- Full Preview ---- */
-  .full-preview-section { margin-top: 20px; }
-  .full-preview-section h3 {
+  /* ---- Trim Accordion ---- */
+  .trim-panel { display: none; }
+  .accordion-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    padding: 0;
+    margin-bottom: 0;
+  }
+  .accordion-header .arrow {
+    width: 20px;
+    height: 20px;
+    transition: transform 0.25s;
+    color: #94a3b8;
+    flex-shrink: 0;
+  }
+  .accordion-header.open .arrow { transform: rotate(90deg); }
+  .accordion-body {
+    display: none;
+    padding-top: 20px;
+  }
+  .accordion-body.open { display: block; }
+  .trim-canvas-wrap {
+    position: relative;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fafafa;
+    cursor: crosshair;
+    user-select: none;
+    -webkit-user-select: none;
+    max-width: 600px;
+  }
+  .trim-canvas-wrap canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .trim-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .btn-trim-apply {
+    padding: 10px 28px;
+    background: #0f172a;
+    color: #fff;
+    border: none;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-trim-apply:hover {
+    background: #1e293b;
+    box-shadow: 0 4px 14px rgba(15,23,42,0.25);
+    transform: translateY(-1px);
+  }
+  .btn-trim-apply:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  .btn-trim-reset {
+    padding: 8px 20px;
+    background: #fff;
+    color: #94a3b8;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-trim-reset:hover {
+    border-color: #ef4444;
+    color: #ef4444;
+    background: #fef2f2;
+  }
+  .trim-info {
+    font-size: 12px;
+    color: #64748b;
+    margin-left: auto;
+  }
+
+  /* ---- Region Select ---- */
+  .region-section { margin-top: 24px; }
+  .region-section h3 {
     font-size: 15px;
     font-weight: 700;
     color: #334155;
     margin-bottom: 12px;
   }
-  .full-preview-container {
+  .region-note {
+    font-size: 13px;
+    color: #64748b;
+    margin-bottom: 12px;
+    background: #f0f9ff;
+    padding: 12px 16px;
+    border-radius: 10px;
+    border-left: 4px solid #3b82f6;
+    line-height: 1.6;
+  }
+  .region-layout {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+  }
+  @media (max-width: 800px) {
+    .region-layout { flex-direction: column; }
+  }
+  .region-left {
+    flex: 0 0 50%;
+    min-width: 0;
+  }
+  .region-right {
+    flex: 1;
+    min-width: 0;
+  }
+  .region-canvas-wrap {
+    position: relative;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #fafafa;
+    cursor: crosshair;
+    user-select: none;
+    -webkit-user-select: none;
+  }
+  .region-canvas-wrap canvas {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .region-result {
+    display: none;
+  }
+  .region-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 200px;
+    border: 1.5px dashed #e2e8f0;
+    border-radius: 10px;
+    color: #94a3b8;
+    font-size: 13px;
+    text-align: center;
+    line-height: 1.6;
+  }
+  .region-result-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+  }
+  .region-dpi-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    border-radius: 10px;
+    font-size: 18px;
+    font-weight: 800;
+  }
+  .region-dpi-badge.ok {
+    background: #f0fdf4;
+    border: 1.5px solid #bbf7d0;
+    color: #16a34a;
+  }
+  .region-dpi-badge.ng {
+    background: #fef7ee;
+    border: 1.5px solid #fed7aa;
+    color: #ea580c;
+  }
+  .region-dpi-badge .region-dpi-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #94a3b8;
+  }
+  .region-info {
+    font-size: 12px;
+    color: #64748b;
+    margin-bottom: 10px;
+  }
+  .region-zoom-container {
     border: 1.5px solid #e2e8f0;
     border-radius: 10px;
     overflow: hidden;
     background: #fafafa;
   }
-  .full-preview-container canvas {
-    display: block;
-    width: 100%;
-    height: auto;
+  .region-zoom-scroll {
+    overflow: auto;
+    max-height: 400px;
+    cursor: grab;
   }
+  .region-zoom-scroll:active { cursor: grabbing; }
+  .region-zoom-scroll canvas { display: block; }
 
   /* ---- Reset button ---- */
   .reset-btn {
@@ -492,7 +726,7 @@
       <span class="step-num">1</span> 画像をアップロード
     </div>
     <div class="drop-zone" id="dropZone">
-      <input type="file" id="fileInput" accept="image/*">
+      <input type="file" id="fileInput" accept="image/*,.pdf">
       <div class="placeholder" id="placeholder">
         <div class="upload-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
@@ -503,11 +737,31 @@
         </div>
         <p>ここに画像をドラッグ＆ドロップ</p>
         <p>またはクリックしてファイルを選択</p>
-        <p class="sub">対応形式: JPG, PNG, BMP, TIFF, GIF</p>
+        <p class="sub">対応形式: JPG, PNG, BMP, TIFF, GIF, PDF</p>
       </div>
       <div id="previewArea" style="display:none;">
         <img id="previewImg" class="preview-thumb" alt="プレビュー">
         <div class="image-info" id="imageInfo"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Trim (accordion) -->
+  <div class="panel trim-panel" id="trimPanel">
+    <div class="panel-title accordion-header" id="trimAccordion">
+      <svg class="arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+      画像をトリミング
+      <span style="font-size:12px; font-weight:500; color:#94a3b8;">（必要な場合のみ）</span>
+    </div>
+    <div class="accordion-body" id="trimBody">
+      <p style="font-size:13px; color:#64748b; margin-bottom:14px;">画像の上でドラッグして使用範囲を選択し、「トリミングを適用」を押してください。</p>
+      <div class="trim-canvas-wrap" id="trimWrap">
+        <canvas id="trimCanvas"></canvas>
+      </div>
+      <div class="trim-actions">
+        <button class="btn-trim-apply" id="trimApplyBtn" disabled>トリミングを適用</button>
+        <button class="btn-trim-reset" id="trimResetBtn" style="display:none;">元の画像に戻す</button>
+        <span class="trim-info" id="trimInfo"></span>
       </div>
     </div>
   </div>
@@ -588,6 +842,13 @@
         </div>
       </div>
 
+      <div class="dpi-hero" id="dpiHero">
+        <div class="dpi-hero-info">
+          <div class="dpi-hero-label">有効解像度</div>
+          <div><span class="dpi-hero-number" id="dpiMinValue">-</span><span class="dpi-hero-unit"> dpi</span></div>
+        </div>
+      </div>
+
       <div class="dpi-details">
         <div class="dpi-card">
           <div class="label">画像サイズ</div>
@@ -603,21 +864,6 @@
           <div class="label">注文サイズ</div>
           <div class="value" id="orderSizeValue">-</div>
           <div class="unit">mm</div>
-        </div>
-        <div class="dpi-card">
-          <div class="label">横方向 解像度</div>
-          <div class="value" id="dpiHValue">-</div>
-          <div class="unit">dpi</div>
-        </div>
-        <div class="dpi-card">
-          <div class="label">縦方向 解像度</div>
-          <div class="value" id="dpiVValue">-</div>
-          <div class="unit">dpi</div>
-        </div>
-        <div class="dpi-card">
-          <div class="label">有効解像度（低い方）</div>
-          <div class="value" id="dpiMinValue">-</div>
-          <div class="unit">dpi</div>
         </div>
       </div>
 
@@ -683,17 +929,47 @@
         </div>
       </div>
 
-      <!-- Full preview -->
-      <div class="full-preview-section">
-        <h3>全体プレビュー（注文サイズに合わせた表示）</h3>
-        <div class="full-preview-container">
-          <canvas id="fullCanvas"></canvas>
+      <!-- Region select -->
+      <div class="region-section">
+        <h3>部分拡大チェック</h3>
+        <div class="region-note">
+          左の画像の上でドラッグして四角を描くと、その部分の実寸拡大プレビューを右に表示します。
+        </div>
+        <div class="region-layout">
+          <div class="region-left">
+            <div class="region-canvas-wrap" id="regionWrap">
+              <canvas id="regionCanvas"></canvas>
+            </div>
+          </div>
+          <div class="region-right">
+            <div class="region-placeholder" id="regionPlaceholder">
+              画像の上で四角を描いてください
+            </div>
+            <div class="region-result" id="regionResult">
+              <div class="region-result-header">
+                <div class="region-dpi-badge" id="regionDpiBadge">
+                  <span class="region-dpi-label">解像度</span>
+                  <span id="regionDpiValue">-</span> dpi
+                </div>
+                <button class="btn-download" id="regionDownloadBtn" style="width:auto; border-radius:8px;">
+                  <svg><use href="#ico-download"/></svg>ダウンロード
+                </button>
+              </div>
+              <div class="region-info" id="regionInfo"></div>
+              <div class="region-zoom-container">
+                <div class="region-zoom-scroll" id="regionZoomScroll">
+                  <canvas id="regionZoomCanvas"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script>
 (function() {
   const dropZone = document.getElementById('dropZone');
@@ -712,22 +988,29 @@
   const resultDesc = document.getElementById('resultDesc');
   const resetBtn = document.getElementById('resetBtn');
   const zoomSection = document.getElementById('zoomSection');
-  const fullCanvas = document.getElementById('fullCanvas');
 
   const DPI_THRESHOLD = 100;
   let loadedImage = null;
   let loadedFileName = '';
+  let originalImage = null;
 
   // ---- Drag & Drop ----
+  function isPDF(file) { return file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf'); }
+  function isImage(file) { return file.type.startsWith('image/'); }
+  function routeFile(file) {
+    if (!file) return;
+    if (isPDF(file)) { handlePDF(file); }
+    else if (isImage(file)) { handleFile(file); }
+  }
+
   dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
   dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('drag-over'); });
   dropZone.addEventListener('drop', (e) => {
     e.preventDefault();
     dropZone.classList.remove('drag-over');
-    const file = e.dataTransfer.files[0];
-    if (file && file.type.startsWith('image/')) handleFile(file);
+    routeFile(e.dataTransfer.files[0]);
   });
-  fileInput.addEventListener('change', () => { if (fileInput.files[0]) handleFile(fileInput.files[0]); });
+  fileInput.addEventListener('change', () => { routeFile(fileInput.files[0]); });
 
   function handleFile(file) {
     const reader = new FileReader();
@@ -746,10 +1029,69 @@
         dropZone.classList.add('has-image');
         updateCheckBtn();
         resultArea.style.display = 'none';
+        originalImage = null;
+        showTrimPanel();
       };
       img.src = e.target.result;
     };
     reader.readAsDataURL(file);
+  }
+
+  // ---- PDF handling ----
+  pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+  function handlePDF(file) {
+    // Show loading state
+    placeholder.style.display = 'none';
+    previewArea.style.display = 'block';
+    previewImg.src = '';
+    imageInfo.textContent = 'PDF を読み込み中...';
+    dropZone.classList.add('has-image');
+
+    const reader = new FileReader();
+    reader.onload = async (e) => {
+      try {
+        const pdf = await pdfjsLib.getDocument({ data: new Uint8Array(e.target.result) }).promise;
+        const page = await pdf.getPage(1);
+        // Get the base viewport (72dpi) to know original PDF dimensions
+        const baseViewport = page.getViewport({ scale: 1 });
+        // Cap max pixel dimension to 8000px to avoid memory issues with large PDFs
+        const MAX_PX = 8000;
+        const maxDim = Math.max(baseViewport.width, baseViewport.height);
+        const scale = maxDim * 4 > MAX_PX ? MAX_PX / maxDim : 4;
+        const viewport = page.getViewport({ scale: scale });
+        const offCanvas = document.createElement('canvas');
+        offCanvas.width = Math.round(viewport.width);
+        offCanvas.height = Math.round(viewport.height);
+        const ctx = offCanvas.getContext('2d');
+        await page.render({ canvasContext: ctx, viewport: viewport }).promise;
+        // Convert canvas to Image (same as image flow)
+        const img = new Image();
+        img.onload = () => {
+          loadedImage = img;
+          loadedFileName = file.name.replace(/\.[^.]+$/, '');
+          previewImg.src = img.src;
+          const fileSizeKB = (file.size / 1024).toFixed(1);
+          const fileSizeMB = (file.size / 1024 / 1024).toFixed(2);
+          const sizeStr = file.size > 1024 * 1024 ? `${fileSizeMB} MB` : `${fileSizeKB} KB`;
+          const pdfW_mm = Math.round(baseViewport.width / 72 * 25.4);
+          const pdfH_mm = Math.round(baseViewport.height / 72 * 25.4);
+          const totalPages = pdf.numPages;
+          imageInfo.textContent = `${file.name}  |  ${img.naturalWidth} \u00d7 ${img.naturalHeight} px  |  PDF原寸: ${pdfW_mm} \u00d7 ${pdfH_mm} mm  |  ${sizeStr}  |  ${totalPages}ページ（1ページ目を使用）`;
+          updateCheckBtn();
+          resultArea.style.display = 'none';
+          originalImage = null;
+          showTrimPanel();
+        };
+        img.src = offCanvas.toDataURL('image/png');
+      } catch (err) {
+        alert('PDFの読み込みに失敗しました: ' + err.message);
+        placeholder.style.display = '';
+        previewArea.style.display = 'none';
+        dropZone.classList.remove('has-image');
+      }
+    };
+    reader.readAsArrayBuffer(file);
   }
 
   // ---- Presets ----
@@ -799,15 +1141,9 @@
     document.getElementById('imgSizeMmValue').textContent = `${imgW_mm} \u00d7 ${imgH_mm}`;
     document.getElementById('orderSizeValue').textContent = `${orderW_mm} \u00d7 ${orderH_mm}`;
 
-    const dpiHEl = document.getElementById('dpiHValue');
-    dpiHEl.textContent = dpiH.toFixed(1);
-    dpiHEl.className = 'value ' + (dpiH >= DPI_THRESHOLD ? 'ok' : 'ng');
-    const dpiVEl = document.getElementById('dpiVValue');
-    dpiVEl.textContent = dpiV.toFixed(1);
-    dpiVEl.className = 'value ' + (dpiV >= DPI_THRESHOLD ? 'ok' : 'ng');
-    const dpiMinEl = document.getElementById('dpiMinValue');
-    dpiMinEl.textContent = dpiMin.toFixed(1);
-    dpiMinEl.className = 'value ' + (isOk ? 'ok' : 'ng');
+    document.getElementById('dpiMinValue').textContent = dpiMin.toFixed(1);
+    const dpiHero = document.getElementById('dpiHero');
+    dpiHero.className = 'dpi-hero ' + (isOk ? 'ok' : 'ng');
 
     // ---- Aspect ratio check ----
     const imgRatio = imgW / imgH;
@@ -840,7 +1176,8 @@
     } else {
       zoomSection.style.display = 'none';
     }
-    drawFullPreview(orderW_mm, orderH_mm);
+    drawRegionBase();
+    document.getElementById('regionResult').style.display = 'none';
     resultArea.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
@@ -879,19 +1216,6 @@
     ctx.imageSmoothingEnabled = true;
     ctx.imageSmoothingQuality = 'low';
     ctx.drawImage(loadedImage, sx, sy, aw, ah, 0, 0, canvas.width, canvas.height);
-  }
-
-  // ---- Full Preview ----
-  function drawFullPreview(orderW_mm, orderH_mm) {
-    const w = fullCanvas.parentElement.clientWidth;
-    const h = w / (orderW_mm / orderH_mm);
-    fullCanvas.width = w; fullCanvas.height = h;
-    const ctx = fullCanvas.getContext('2d');
-    ctx.imageSmoothingEnabled = true;
-    ctx.imageSmoothingQuality = 'medium';
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(0, 0, w, h);
-    ctx.drawImage(loadedImage, 0, 0, w, h);
   }
 
   // ---- Drag-scroll ----
@@ -943,10 +1267,311 @@
     });
   });
 
+  // ---- Region select ----
+  const regionCanvas = document.getElementById('regionCanvas');
+  const regionCtx = regionCanvas.getContext('2d');
+  const regionWrap = document.getElementById('regionWrap');
+  const regionResult = document.getElementById('regionResult');
+  const regionZoomCanvas = document.getElementById('regionZoomCanvas');
+  const regionZoomScroll = document.getElementById('regionZoomScroll');
+  let regDragging = false, regStartX = 0, regStartY = 0, regRect = null;
+  const REG_MAX_RATIO = 0.25; // max 25% of image width/height
+
+  function drawRegionBase() {
+    if (!loadedImage) return;
+    const w = regionCanvas.parentElement.clientWidth;
+    const h = w / (loadedImage.naturalWidth / loadedImage.naturalHeight);
+    regionCanvas.width = w;
+    regionCanvas.height = h;
+    regionCtx.drawImage(loadedImage, 0, 0, w, h);
+  }
+
+  function clampRegion(x1, y1, x2, y2) {
+    const maxDim = Math.min(regionCanvas.width, regionCanvas.height) * REG_MAX_RATIO;
+    let w = x2 - x1, h = y2 - y1;
+    const signW = w >= 0 ? 1 : -1, signH = h >= 0 ? 1 : -1;
+    if (Math.abs(w) > maxDim) w = signW * maxDim;
+    if (Math.abs(h) > maxDim) h = signH * maxDim;
+    return { x2: x1 + w, y2: y1 + h };
+  }
+
+  function drawRegionOverlay(x1, y1, x2, y2) {
+    drawRegionBase();
+    const left = Math.min(x1, x2), top = Math.min(y1, y2);
+    const w = Math.abs(x2 - x1), h = Math.abs(y2 - y1);
+    if (w < 2 || h < 2) return;
+    regionCtx.fillStyle = 'rgba(0,0,0,0.4)';
+    regionCtx.fillRect(0, 0, regionCanvas.width, top);
+    regionCtx.fillRect(0, top + h, regionCanvas.width, regionCanvas.height - top - h);
+    regionCtx.fillRect(0, top, left, h);
+    regionCtx.fillRect(left + w, top, regionCanvas.width - left - w, h);
+    regionCtx.strokeStyle = '#3b82f6';
+    regionCtx.lineWidth = 2;
+    regionCtx.setLineDash([6, 3]);
+    regionCtx.strokeRect(left, top, w, h);
+    regionCtx.setLineDash([]);
+  }
+
+  function getCanvasPos(e) {
+    const rect = regionCanvas.getBoundingClientRect();
+    return {
+      x: (e.clientX - rect.left) * (regionCanvas.width / rect.width),
+      y: (e.clientY - rect.top) * (regionCanvas.height / rect.height)
+    };
+  }
+
+  regionWrap.addEventListener('mousedown', (e) => {
+    if (!loadedImage || !widthInput.value || !heightInput.value) return;
+    regDragging = true;
+    const p = getCanvasPos(e);
+    regStartX = p.x; regStartY = p.y;
+    regRect = null;
+    regionResult.style.display = 'none';
+    document.getElementById('regionPlaceholder').style.display = 'flex';
+  });
+  regionWrap.addEventListener('mousemove', (e) => {
+    if (!regDragging) return;
+    const p = getCanvasPos(e);
+    const c = clampRegion(regStartX, regStartY, p.x, p.y);
+    drawRegionOverlay(regStartX, regStartY, c.x2, c.y2);
+  });
+  window.addEventListener('mouseup', (e) => {
+    if (!regDragging) return;
+    regDragging = false;
+    const p = getCanvasPos(e);
+    const c = clampRegion(regStartX, regStartY, p.x, p.y);
+    const left = Math.min(regStartX, c.x2), top = Math.min(regStartY, c.y2);
+    const w = Math.abs(c.x2 - regStartX), h = Math.abs(c.y2 - regStartY);
+    if (w < 5 || h < 5) return;
+    regRect = { left, top, w, h };
+    showRegionZoom();
+  });
+
+  function showRegionZoom() {
+    if (!regRect || !loadedImage) return;
+    const cw = regionCanvas.width, ch = regionCanvas.height;
+    const imgW = loadedImage.naturalWidth, imgH = loadedImage.naturalHeight;
+    const orderW_mm = parseFloat(widthInput.value), orderH_mm = parseFloat(heightInput.value);
+    if (!orderW_mm || !orderH_mm) return;
+
+    // Convert canvas selection to source image pixels
+    const srcX = Math.round(regRect.left / cw * imgW);
+    const srcY = Math.round(regRect.top / ch * imgH);
+    const srcW = Math.round(regRect.w / cw * imgW);
+    const srcH = Math.round(regRect.h / ch * imgH);
+    if (srcW < 1 || srcH < 1) return;
+
+    // Calculate DPI for this region
+    // This region covers (regRect.w/cw) of the full width = that fraction of orderW_mm
+    const regionW_mm = (regRect.w / cw) * orderW_mm;
+    const regionH_mm = (regRect.h / ch) * orderH_mm;
+    const regionDpiH = srcW / (regionW_mm / 25.4);
+    const regionDpiV = srcH / (regionH_mm / 25.4);
+    const regionDpi = Math.min(regionDpiH, regionDpiV);
+    const regionOk = regionDpi >= DPI_THRESHOLD;
+
+    // Show DPI badge
+    const badge = document.getElementById('regionDpiBadge');
+    badge.className = 'region-dpi-badge ' + (regionOk ? 'ok' : 'ng');
+    document.getElementById('regionDpiValue').textContent = regionDpi.toFixed(1);
+    document.getElementById('regionInfo').textContent =
+      `選択範囲: ${srcW} \u00d7 ${srcH} px / 印刷サイズ: ${regionW_mm.toFixed(0)} \u00d7 ${regionH_mm.toFixed(0)} mm`;
+
+    // Render zoomed preview at print scale
+    const scaleX = ((orderW_mm / 25.4) * 96) / imgW;
+    const scaleY = ((orderH_mm / 25.4) * 96) / imgH;
+    const scale = Math.max(scaleX, scaleY);
+    const outW = Math.round(srcW * scale);
+    const outH = Math.round(srcH * scale);
+    regionZoomCanvas.width = outW;
+    regionZoomCanvas.height = outH;
+    const ctx = regionZoomCanvas.getContext('2d');
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'low';
+    ctx.drawImage(loadedImage, srcX, srcY, srcW, srcH, 0, 0, outW, outH);
+
+    document.getElementById('regionPlaceholder').style.display = 'none';
+    regionResult.style.display = 'block';
+  }
+
+  // Region zoom drag-scroll
+  let regZoomDrag = false, regZdx, regZdy, regZsx, regZsy;
+  regionZoomScroll.addEventListener('mousedown', (e) => {
+    if (e.target === regionZoomCanvas || e.target === regionZoomScroll) {
+      regZoomDrag = true;
+      regZdx = e.clientX; regZdy = e.clientY;
+      regZsx = regionZoomScroll.scrollLeft; regZsy = regionZoomScroll.scrollTop;
+      e.stopPropagation();
+    }
+  });
+  window.addEventListener('mousemove', (e) => {
+    if (!regZoomDrag) return;
+    regionZoomScroll.scrollLeft = regZsx - (e.clientX - regZdx);
+    regionZoomScroll.scrollTop = regZsy - (e.clientY - regZdy);
+  });
+  window.addEventListener('mouseup', () => { regZoomDrag = false; });
+
+  // Region download
+  document.getElementById('regionDownloadBtn').addEventListener('click', () => {
+    if (regionZoomCanvas.width > 0) {
+      downloadCanvas(regionZoomCanvas, `${loadedFileName || 'image'}_部分拡大.png`);
+    }
+  });
+
+  // ---- Trim (crop) ----
+  const trimPanel = document.getElementById('trimPanel');
+  const trimAccordion = document.getElementById('trimAccordion');
+  const trimBody = document.getElementById('trimBody');
+  const trimCanvas = document.getElementById('trimCanvas');
+  const trimCtx = trimCanvas.getContext('2d');
+  const trimWrap = document.getElementById('trimWrap');
+  const trimApplyBtn = document.getElementById('trimApplyBtn');
+  const trimResetBtn = document.getElementById('trimResetBtn');
+  const trimInfo = document.getElementById('trimInfo');
+  let trimDragging = false, trimStartX = 0, trimStartY = 0, trimRect = null;
+
+  trimAccordion.addEventListener('click', () => {
+    trimAccordion.classList.toggle('open');
+    trimBody.classList.toggle('open');
+    if (trimBody.classList.contains('open')) drawTrimBase();
+  });
+
+  function showTrimPanel() {
+    trimPanel.style.display = 'block';
+    trimRect = null;
+    trimApplyBtn.disabled = true;
+    trimInfo.textContent = '';
+  }
+
+  function drawTrimBase() {
+    const src = originalImage || loadedImage;
+    if (!src) return;
+    const w = trimCanvas.parentElement.clientWidth;
+    const h = w / (src.naturalWidth / src.naturalHeight);
+    trimCanvas.width = w;
+    trimCanvas.height = h;
+    trimCtx.drawImage(src, 0, 0, w, h);
+  }
+
+  function drawTrimOverlay(x1, y1, x2, y2) {
+    drawTrimBase();
+    const left = Math.min(x1, x2), top = Math.min(y1, y2);
+    const w = Math.abs(x2 - x1), h = Math.abs(y2 - y1);
+    if (w < 2 || h < 2) return;
+    trimCtx.fillStyle = 'rgba(0,0,0,0.45)';
+    trimCtx.fillRect(0, 0, trimCanvas.width, top);
+    trimCtx.fillRect(0, top + h, trimCanvas.width, trimCanvas.height - top - h);
+    trimCtx.fillRect(0, top, left, h);
+    trimCtx.fillRect(left + w, top, trimCanvas.width - left - w, h);
+    trimCtx.strokeStyle = '#3b82f6';
+    trimCtx.lineWidth = 2;
+    trimCtx.setLineDash([6, 3]);
+    trimCtx.strokeRect(left, top, w, h);
+    trimCtx.setLineDash([]);
+  }
+
+  function getTrimCanvasPos(e) {
+    const rect = trimCanvas.getBoundingClientRect();
+    return {
+      x: (e.clientX - rect.left) * (trimCanvas.width / rect.width),
+      y: (e.clientY - rect.top) * (trimCanvas.height / rect.height)
+    };
+  }
+
+  trimWrap.addEventListener('mousedown', (e) => {
+    const src = originalImage || loadedImage;
+    if (!src) return;
+    trimDragging = true;
+    const p = getTrimCanvasPos(e);
+    trimStartX = p.x; trimStartY = p.y;
+    trimRect = null;
+    trimApplyBtn.disabled = true;
+    trimInfo.textContent = '';
+  });
+  trimWrap.addEventListener('mousemove', (e) => {
+    if (!trimDragging) return;
+    const p = getTrimCanvasPos(e);
+    drawTrimOverlay(trimStartX, trimStartY, p.x, p.y);
+    // Show selection size
+    const src = originalImage || loadedImage;
+    if (src) {
+      const sw = Math.abs(p.x - trimStartX) / trimCanvas.width * src.naturalWidth;
+      const sh = Math.abs(p.y - trimStartY) / trimCanvas.height * src.naturalHeight;
+      trimInfo.textContent = `${Math.round(sw)} × ${Math.round(sh)} px`;
+    }
+  });
+  window.addEventListener('mouseup', (e) => {
+    if (!trimDragging) return;
+    trimDragging = false;
+    const p = getTrimCanvasPos(e);
+    const left = Math.min(trimStartX, p.x), top = Math.min(trimStartY, p.y);
+    const w = Math.abs(p.x - trimStartX), h = Math.abs(p.y - trimStartY);
+    if (w < 5 || h < 5) return;
+    trimRect = { left, top, w, h };
+    trimApplyBtn.disabled = false;
+  });
+
+  trimApplyBtn.addEventListener('click', () => {
+    if (!trimRect) return;
+    const src = originalImage || loadedImage;
+    if (!src) return;
+    // Save original on first trim
+    if (!originalImage) originalImage = loadedImage;
+
+    // Convert canvas coords to source image pixels
+    const imgW = src.naturalWidth, imgH = src.naturalHeight;
+    const sx = Math.round(trimRect.left / trimCanvas.width * imgW);
+    const sy = Math.round(trimRect.top / trimCanvas.height * imgH);
+    const sw = Math.round(trimRect.w / trimCanvas.width * imgW);
+    const sh = Math.round(trimRect.h / trimCanvas.height * imgH);
+
+    // Create cropped image
+    const offCanvas = document.createElement('canvas');
+    offCanvas.width = sw;
+    offCanvas.height = sh;
+    const octx = offCanvas.getContext('2d');
+    octx.drawImage(src, sx, sy, sw, sh, 0, 0, sw, sh);
+
+    const croppedImg = new Image();
+    croppedImg.onload = () => {
+      loadedImage = croppedImg;
+      // Update Step 1 preview
+      previewImg.src = croppedImg.src;
+      imageInfo.textContent = `${loadedFileName} (トリミング済)  |  ${sw} × ${sh} px`;
+      // Reset check result
+      resultArea.style.display = 'none';
+      updateCheckBtn();
+      // Update trim canvas to show cropped image
+      drawTrimBase();
+      trimRect = null;
+      trimApplyBtn.disabled = true;
+      trimInfo.textContent = `トリミング適用済み: ${sw} × ${sh} px`;
+      trimResetBtn.style.display = '';
+    };
+    croppedImg.src = offCanvas.toDataURL('image/png');
+  });
+
+  trimResetBtn.addEventListener('click', () => {
+    if (!originalImage) return;
+    loadedImage = originalImage;
+    originalImage = null;
+    // Update Step 1 preview
+    previewImg.src = loadedImage.src;
+    imageInfo.textContent = `${loadedFileName}  |  ${loadedImage.naturalWidth} × ${loadedImage.naturalHeight} px`;
+    resultArea.style.display = 'none';
+    updateCheckBtn();
+    drawTrimBase();
+    trimRect = null;
+    trimApplyBtn.disabled = true;
+    trimResetBtn.style.display = 'none';
+    trimInfo.textContent = '';
+  });
+
   // ---- Reset ----
   resetBtn.addEventListener('click', () => {
     resultArea.style.display = 'none';
     loadedImage = null; loadedFileName = '';
+    originalImage = null;
     previewImg.src = ''; imageInfo.textContent = '';
     previewArea.style.display = 'none';
     placeholder.style.display = '';
@@ -954,6 +1579,14 @@
     fileInput.value = '';
     widthInput.value = ''; heightInput.value = '';
     updateCheckBtn();
+    // Reset trim
+    trimPanel.style.display = 'none';
+    trimAccordion.classList.remove('open');
+    trimBody.classList.remove('open');
+    trimRect = null;
+    trimApplyBtn.disabled = true;
+    trimResetBtn.style.display = 'none';
+    trimInfo.textContent = '';
     window.scrollTo({ top: 0, behavior: 'smooth' });
   });
 })();
